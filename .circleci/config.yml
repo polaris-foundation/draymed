@@ -1,0 +1,164 @@
+x-environment:
+  &COMMON_ENVIRONMENT
+  COVERAGE_REPORT_DIR: "coverage-reports"
+  LIBRARY_FOLDERS: "draymed_js draymed_py"
+version: 2.1
+orbs:
+  ms-teams: cloudradar-monitoring/ms-teams@0.0.1
+jobs:
+  test-python:
+    docker:
+      - image: cimg/python:3.8
+    environment:
+      <<: *COMMON_ENVIRONMENT
+    steps:
+      - checkout
+      - run:
+          name: Create coverage report dir
+          command: mkdir -p ./draymed_py/coverage-reports
+      - run:
+          name: Set up tox tests
+          working_directory: ./draymed_py
+          command: pip install --upgrade tox
+      - restore_cache:
+          keys:
+            - v1-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
+            - v1-poetry-deps-
+      - run:
+          name: Run tox tests
+          working_directory: ./draymed_py
+          command: tox -e py38
+      - save_cache:
+          key: v1-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
+          paths:
+            - .tox
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./draymed_py/coverage-reports
+  deploy-gemfury-python-lib:
+    docker:
+      - image: cimg/python:3.8
+    environment:
+      <<: *COMMON_ENVIRONMENT
+    steps:
+      - checkout
+      - run:
+          name: Install deps
+          command: pip install --upgrade toml
+          working_directory: ./draymed_py
+      - run:
+          name: Publish package to gemfury
+          command: ../.circleci/publish_gemfury.sh
+          working_directory: ./draymed_py
+      - ms-teams/report:
+          only_on_fail: true
+          webhook_url: ${MSTEAMS_NOTIFY_WEBHOOK_URL}
+  deploy-gemfury-javascript-lib:
+    docker:
+      - image: circleci/node:11.13.0
+    environment:
+      <<: *COMMON_ENVIRONMENT
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: yarn install --frozen-lockfile
+          working_directory: ./draymed_js
+      - run:
+          name: Build the library
+          command: yarn build
+          working_directory: ./draymed_js
+      - run:
+          name: Upload to gemfury
+          command: ../.circleci/push_gemfury.sh $(npm pack)
+          working_directory: ./draymed_js
+      - ms-teams/report:
+          only_on_fail: true
+          webhook_url: ${MSTEAMS_NOTIFY_WEBHOOK_URL}
+  make-version-tags:
+    docker:
+      - image: cimg/python:3.8
+    environment:
+      <<: *COMMON_ENVIRONMENT
+    steps:
+      - checkout
+      - run:
+          name: Install deps
+          command: pip install --upgrade toml
+          working_directory: ./draymed_py
+      - run:
+          name: Create git tag
+          command: git tag v$(python3 parse_version.py)
+          working_directory: ./draymed_py
+      - run:
+          name: Push git tag
+          command: git push --tags
+      - ms-teams/report:
+          only_on_fail: true
+          webhook_url: ${MSTEAMS_NOTIFY_WEBHOOK_URL}
+  test-javascript:
+    docker:
+      - image: circleci/node:11.13.0
+    environment:
+      <<: *COMMON_ENVIRONMENT
+    steps:
+      - checkout
+      - run:
+          name: Create coverage report dir
+          command: mkdir -p ./draymed_js/coverage-reports
+      - restore_cache:
+          keys:
+            - v1-yarn-deps-{{ checksum "./draymed_js/yarn.lock" }}
+            - v1-yarn-deps-
+      - run:
+          name: Set up yarn tests
+          command: yarn install --frozen-lockfile
+          working_directory: ./draymed_js
+      - save_cache:
+          key: v1-yarn-deps-{{ checksum "./draymed_js/yarn.lock" }}
+          paths:
+            - node_modules
+      - run:
+          name: Run yarn tests
+          command: yarn test
+          working_directory: ./draymed_js
+      - persist_to_workspace:
+          root: .
+          paths:
+            - ./draymed_js/coverage-reports
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - test-python:
+          context: engineering-build
+      - test-javascript:
+          context: engineering-build
+      - deploy-gemfury-python-lib:
+          context: engineering-build
+          requires:
+            - test-python
+            - test-javascript
+          filters:
+            branches:
+              only:
+                - master
+      - deploy-gemfury-javascript-lib:
+          context: dhos-deploy
+          requires:
+            - test-python
+            - test-javascript
+          filters:
+            branches:
+              only:
+                - master
+      - make-version-tags:
+          context: engineering-build
+          requires:
+            - deploy-gemfury-python-lib
+            - deploy-gemfury-javascript-lib
+          filters:
+            branches:
+              only:
+                - master
