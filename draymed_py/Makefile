@@ -12,7 +12,7 @@ gitroot = ${shell git rev-parse --show-toplevel}
 repo = ${notdir ${gitroot}}
 PROJECT_NAME ?= ${repo}
 project = ${dir ${shell git ls-files --full-name ${firstword ${MAKEFILE_LIST}}}}
-python_version = 3.8.5
+python_version = 3.9.5
 ignore_packages ?= migrations/
 packages = ${filter-out ${ignore_packages},${dir ${wildcard */__init__.py}}}
 

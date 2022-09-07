@@ -5,7 +5,7 @@ version: 2.1
 jobs:
   test-python:
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/python:3.9
     environment:
       <<: *COMMON_ENVIRONMENT
     steps:
@@ -16,14 +16,14 @@ jobs:
           command: pip install --upgrade tox
       - restore_cache:
           keys:
-            - v2-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
-            - v2-poetry-deps-
+            - v3-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
+            - v3-poetry-deps-
       - run:
           name: Run tox tests
           working_directory: ./draymed_py
-          command: tox -e py38
+          command: tox -e py39
       - save_cache:
-          key: v2-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
+          key: v3-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
           paths:
             - .tox
   test-javascript:
@@ -51,7 +51,7 @@ jobs:
           working_directory: ./draymed_js
   publish-pypi-python-lib:
     docker:
-      - image: cimg/python:3.8
+      - image: cimg/python:3.9
     steps:
       - add_ssh_keys:
           fingerprints:
