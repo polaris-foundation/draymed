@@ -21,7 +21,7 @@ jobs:
       - run:
           name: Run tox tests
           working_directory: ./draymed_py
-          command: tox -e py38
+          command: tox -e py39
       - save_cache:
           key: v1-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
           paths:
