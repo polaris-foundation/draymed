@@ -1,6 +1,6 @@
 {
   "name": "draymed-js",
-  "version": "2.1.6",
+  "version": "2.1.7",
   "description": "Javascript library for providing SNOMED (and custom) codes",
   "main": "dist/index.js",
   "types": "dist/index.d.js",

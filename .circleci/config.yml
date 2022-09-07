@@ -60,12 +60,7 @@ jobs:
       - run:
           name: Publish package to pypi
           command: poetry publish --build --username __token__ --password $PYPI_API_TOKEN
-      - run:
-          name: Create git tag
-          command: pip install -U toml && git tag v$(python3 .circleci/parse_version.py)
-      - run:
-          name: Push git tag
-          command: git push --tags
+          working_directory: ./draymed_py
   publish-npm-javascript-lib:
     docker:
       - image: circleci/node:11.13.0
