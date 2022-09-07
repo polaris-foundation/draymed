@@ -1,3 +1,6 @@
+# 2.1.6
+- Moved hosting to public npm
+
 # 2.1.3
 - Added `Pre-GDm only` to closed_reason object
 

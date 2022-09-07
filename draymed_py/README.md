@@ -10,7 +10,6 @@ It's generally a good idea to have the latest version of pip installed:
 pip3 install --upgrade pip
 ```
 
-You will need `PIP_EXTRA_INDEX_URL` defined.
 More information can be found here: [Dev Environment Setup](https://sensynehealth.atlassian.net/wiki/spaces/SENS/pages/3193270/Environment+setup)
 
 ```bash
@@ -52,8 +51,8 @@ all other configuration is in `tox.ini`
 
 ## Deployment
 
-When a PR is merged into master, a Circle CI job is triggered and the new code is pushed to gemfury.
-For the new code to be available for install from Gemfury, the version in `pyproject.toml` must be bumped for every change.
+When a PR is merged into master, a Circle CI job is triggered and the new code is pushed to pypi.
+For the new code to be available for install from pypi, the version in `pyproject.toml` must be bumped for every change.
 Javascript library version must remain aligned with Python library version.
 When incrementing Python library version in `pyproject.toml`, also increment Javascript library version in `package.json`.
 

@@ -1,3 +1,6 @@
+# 2.1.6
+- Moved hosting to public pypi
+
 # 2.1.5
 - Added `Glucose Tolerance` Test code
 
