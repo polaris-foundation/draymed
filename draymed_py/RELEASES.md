@@ -1,3 +1,6 @@
+# 2.1.7
+- Fixed publishing process
+
 # 2.1.6
 - Moved hosting to public pypi
 
