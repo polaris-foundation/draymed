@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Set up tox tests
           working_directory: ./draymed_py
-          command: pip install --upgrade tox setuptools
+          command: pip install --upgrade tox
       - restore_cache:
           keys:
             - v2-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
