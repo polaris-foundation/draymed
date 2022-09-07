@@ -1,11 +1,11 @@
 {
   "name": "draymed-js",
-  "version": "2.1.5",
+  "version": "2.1.6",
   "description": "Javascript library for providing SNOMED (and custom) codes",
   "main": "dist/index.js",
   "types": "dist/index.d.js",
-  "license": "UNLICENSED",
-  "private": true,
+  "license": "MIT",
+  "private": false,
   "scripts": {
     "build": "tsc -p . && mkdir -p ./dist/data && cp -f ./src/data/master_codes.json ./dist/data/master_codes.json",
     "lint": "yarn eslint --quiet ./src ./tests",
@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/draysontechnologies/draymed-js.git"
+    "url": "git+https://github.com/polaris-foundation/draymed.git"
   },
   "engines": {
     "node": ">=6.6.0",
