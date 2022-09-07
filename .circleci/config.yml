@@ -16,14 +16,14 @@ jobs:
           command: pip install --upgrade tox
       - restore_cache:
           keys:
-            - v1-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
-            - v1-poetry-deps-
+            - v2-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
+            - v2-poetry-deps-
       - run:
           name: Run tox tests
           working_directory: ./draymed_py
           command: tox -e py39
       - save_cache:
-          key: v1-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
+          key: v2-poetry-deps-{{ checksum "./draymed_py/poetry.lock" }}
           paths:
             - .tox
   test-javascript:
